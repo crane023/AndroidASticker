@@ -14,7 +14,9 @@ import com.example.zhtq.asticker.utils.LogUtil;
 import com.example.zhtq.asticker.widgets.CustomSimpleAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -67,7 +69,7 @@ public class Ssq extends AppCompatActivity {
                int count = Integer.parseInt(para);
                boolean checked = mSpecialChecker.isChecked();
                if (checked) {
-                   generatezSequently(count);
+                   generateAtInterval(count);
                } else {
                    generate(count);
                }
@@ -141,4 +143,29 @@ public class Ssq extends AppCompatActivity {
         mDisposable.add(disposable);
     }
 
+    private void generateAtInterval(final int count) {
+        mAdapter.clear();
+        final SsqAlgo algo = new SsqAlgo();
+        mGenCount = 0;
+        Disposable disposable = Observable.intervalRange(1, count, 20, 300, TimeUnit.MILLISECONDS)
+                .map(new Function<Long, byte[]>() {
+                             @Override
+                             public byte[] apply(Long value) throws Exception {
+                                 LogUtil.d(TAG, "flatMap, at interval:%d.", value);
+                                 byte[] results = new byte[7];
+                                 algo.generate2(results);
+                                 return results;
+                             }
+                         }
+                ).observeOn(AndroidSchedulers.mainThread()
+                ).subscribeOn(Schedulers.io()
+                ).subscribe(new Consumer<byte[]>() {
+                    @Override
+                    public void accept(byte[] o) throws Exception {
+                        LogUtil.d(TAG, "generate:%s.", Arrays.toString(o));
+                        mAdapter.add(o);
+                    }
+                });
+        mDisposable.add(disposable);
+    }
 }
