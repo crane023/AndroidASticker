@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">ASticker</string>
     <string name="executive_text_start">start</string>
-    <string name="check_desc_special_check1">smoothly</string>
+    <string name="check_desc_red_ball_can_repeat">red repeat</string>
+    <string name="check_desc_blue_ball_need_unique">blue unique</string>
 </resources>

@@ -24,21 +24,35 @@ public class SsqAlgo {
 	 * blue:1-16
 	 * @param bytes
 	 */
-	public void generate2(byte[] bytes) {
+	public void generate2(byte[] bytes, boolean redUnique, boolean blueUnique) {
 		if (bytes == null || bytes.length != 7) {
 			return;
 		}
 		Random random = new Random();
-		int randomNum;
+		byte randomNum;
 		for (int i = 0; i < bytes.length; i++) {
-			if (i == bytes.length -1) {
-				randomNum = generatePositive(random, 17, 5);
-			} else {
-				randomNum = generatePositive(random, 34, 5);
+			if (i == bytes.length -1) { // blue
+				do {
+					randomNum = (byte) generatePositive(random, 17, 5);
+				} while (blueUnique && findIn(randomNum, bytes));
+			} else { // red
+				do {
+					randomNum = (byte)generatePositive(random, 34, 5);
+				} while (redUnique && findIn(randomNum, bytes));
 			}
-			bytes[i] = (byte)randomNum;
+			bytes[i] = randomNum;
 		}
 	}
+
+	private boolean findIn(byte value, byte[] values) {
+		for (byte item : values) {
+			if (item == value) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 
 	/**
 	 * 0-99
@@ -88,7 +102,7 @@ public class SsqAlgo {
 				}
 				for (int i = 1; i <= count; i++) {
 					if (realSsq) {
-						ssq.generate2(bytes);
+						ssq.generate2(bytes, false, false);
 					} else {
 						ssq.generate(bytes);
 					}

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -30,7 +29,8 @@ import io.reactivex.schedulers.Schedulers;
 public class Ssq extends AppCompatActivity {
     private static final String TAG = "SsqActivity";
 
-    private AppCompatCheckBox mSpecialChecker;
+    private AppCompatCheckBox mRedRepeatChecker;
+    private AppCompatCheckBox mBlueUniqueChecker;
     private EditText mInputEt;
     private RecyclerView mRcv;
 
@@ -53,7 +53,8 @@ public class Ssq extends AppCompatActivity {
     }
 
     private void initViews() {
-        mSpecialChecker = findViewById(R.id.special_check1);
+        mRedRepeatChecker = findViewById(R.id.red_repeat_checker);
+        mBlueUniqueChecker = findViewById(R.id.blue_unique_checker);
         mInputEt = findViewById(R.id.edit_parameter);
         mRcv = findViewById(R.id.generate_result);
         mRcv.setLayoutManager(new LinearLayoutManager(this));
@@ -67,17 +68,12 @@ public class Ssq extends AppCompatActivity {
                    para = "1";
                }
                int count = Integer.parseInt(para);
-               boolean checked = mSpecialChecker.isChecked();
-               if (checked) {
-                   generateAtInterval(count);
-               } else {
-                   generate(count);
-               }
+               generateAtInterval(count, mRedRepeatChecker.isChecked(), mBlueUniqueChecker.isChecked());
             }
         });
     }
 
-    private void generate(final int count) {
+    private void generate(final int count, final boolean redRepeat, final boolean blueUnique) {
         final SsqAlgo algo = new SsqAlgo();
         Disposable disposable = Observable.just(count)
                 .map(new Function<Integer, List<byte[]>>() {
@@ -87,7 +83,7 @@ public class Ssq extends AppCompatActivity {
                         List<byte[]> stringList = new ArrayList<>();
                         for (int i = 0; i < integer; i++) {
                             byte[] results = new byte[7];
-                            algo.generate2(results);
+                            algo.generate2(results, !redRepeat, blueUnique);
                             stringList.add(results);
                         }
                         return stringList;
@@ -104,56 +100,16 @@ public class Ssq extends AppCompatActivity {
         mDisposable.add(disposable);
     }
 
-    private int mGenCount;
-    private void generatezSequently(final int count) {
+    private void generateAtInterval(final int count, final boolean redRepeat, final boolean blueUnique) {
         mAdapter.clear();
         final SsqAlgo algo = new SsqAlgo();
-        mGenCount = 0;
-        Disposable disposable = Observable.just(count)
-                .flatMap(new Function<Integer, ObservableSource<byte[]>>() {
-                     @Override
-                     public ObservableSource<byte[]> apply(Integer integer) throws Exception {
-                         LogUtil.d(TAG, "flatMap, count:%s.", integer);
-                         List<byte[]> stringList = new ArrayList<>();
-                         for (int i = 0; i < integer; i++) {
-                             byte[] results = new byte[7];
-                             algo.generate2(results);
-                             stringList.add(results);
-                         }
-                         return Observable.fromIterable(stringList);
-                     }
-                 }
-//                ).interval(1, 1, java.util.concurrent.TimeUnit.SECONDS
-                ).observeOn(AndroidSchedulers.mainThread()
-                ).subscribeOn(Schedulers.io()
-                ).subscribe(new Consumer<byte[]>() {
-                    @Override
-                    public void accept(byte[] o) throws Exception {
-                        LogUtil.d(TAG, "generate:%s.", o);
-                        final byte[] data = o;
-                        mRcv.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                mAdapter.add(data);
-                            }
-                        }, 100 * mGenCount++);
-
-                    }
-                });
-        mDisposable.add(disposable);
-    }
-
-    private void generateAtInterval(final int count) {
-        mAdapter.clear();
-        final SsqAlgo algo = new SsqAlgo();
-        mGenCount = 0;
         Disposable disposable = Observable.intervalRange(1, count, 20, 300, TimeUnit.MILLISECONDS)
                 .map(new Function<Long, byte[]>() {
                              @Override
                              public byte[] apply(Long value) throws Exception {
                                  LogUtil.d(TAG, "flatMap, at interval:%d.", value);
                                  byte[] results = new byte[7];
-                                 algo.generate2(results);
+                                 algo.generate2(results, !redRepeat, blueUnique);
                                  return results;
                              }
                          }
