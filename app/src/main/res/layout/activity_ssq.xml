@@ -11,13 +11,17 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="12dp"
+        android:hint="@string/edit_hint_the_number_to_generate"
+        android:textSize="@dimen/edit_text_size"
         android:inputType="numberDecimal"
         android:labelFor="@id/generate"
         app:layout_constraintBottom_toBottomOf="@+id/generate"
         app:layout_constraintEnd_toStartOf="@id/generate"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/generate"
@@ -27,15 +31,30 @@
         android:layout_marginEnd="8dp"
         android:text="@string/executive_text_start"
         android:textStyle="normal"
+        android:textSize="@dimen/edit_text_size"
         android:textAllCaps="false"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/capture_and_save" />
+
+    <Button
+        android:id="@+id/capture_and_save"
+        style="@android:style/Widget.Material.Button.Borderless"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/executive_text_capture_and_save"
+        android:textAllCaps="false"
+        android:textSize="@dimen/edit_text_size"
+        android:textStyle="normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/blue_unique_check_desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:text="@string/check_desc_blue_ball_need_unique"
+        android:text="@string/check_desc_capture_manually"
         app:layout_constraintStart_toEndOf="@+id/red_repeat_checker"
         app:layout_constraintTop_toTopOf="@+id/red_repeat_check_desc" />
 
@@ -51,9 +70,9 @@
         android:id="@+id/red_repeat_check_desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="@string/check_desc_red_ball_can_repeat"
+        android:text="@string/check_desc_not_sort_result"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/red_repeat_checker" />
 
@@ -62,9 +81,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintStart_toEndOf="@+id/red_repeat_check_desc"
         app:layout_constraintTop_toBottomOf="@+id/edit_parameter" />
+
+    <View
+        android:id="@+id/after_checker"
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/generate_result"
@@ -74,7 +100,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/after_checker"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/red_repeat_checker" />

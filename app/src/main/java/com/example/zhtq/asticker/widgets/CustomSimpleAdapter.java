@@ -2,21 +2,21 @@ package com.example.zhtq.asticker.widgets;
 
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.UnderlineSpan;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.zhtq.asticker.R;
 import com.example.zhtq.asticker.utils.LogUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CustomSimpleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -48,6 +48,7 @@ public class CustomSimpleAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         TextView textView = new TextView(viewGroup.getContext());
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, viewGroup.getContext().getResources().getDimensionPixelSize(R.dimen.result_rcv_text_size));
         return new ViewHolder2(textView);
     }
 
@@ -67,8 +68,8 @@ public class CustomSimpleAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         int lastDigitLength = Byte.toString(itemData[itemData.length - 1]).length();
-        LogUtil.d(TAG, "display, raw size:%d; processed:%d; last digit length:%d."
-                , itemData.length, builder.length(), lastDigitLength);
+//        LogUtil.d(TAG, "display, raw size:%d; processed:%d; last digit length:%d."
+//                , itemData.length, builder.length(), lastDigitLength);
         builder.setSpan(new ForegroundColorSpan(Color.RED), 0
                 , builder.length() - separator.length() - lastDigitLength
                 , Spannable.SPAN_INCLUSIVE_EXCLUSIVE);

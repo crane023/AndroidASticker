@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">ASticker</string>
-    <string name="executive_text_start">start</string>
+    <string name="executive_text_start">生成</string>
     <string name="check_desc_red_ball_can_repeat">red repeat</string>
     <string name="check_desc_blue_ball_need_unique">blue unique</string>
+    <string name="check_desc_not_sort_result">不予排序</string>
+    <string name="check_desc_capture_manually">手动保存</string>
+    <string name="executive_text_capture_and_save">保存图片</string>
+    <string name="edit_hint_the_number_to_generate">生成数量</string>
 </resources>
