@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
@@ -13,17 +14,21 @@ import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextPaint;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.PixelCopy;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.zhtq.asticker.algo.SsqAlgo;
 import com.example.zhtq.asticker.utils.FileUtils;
 import com.example.zhtq.asticker.utils.LogUtil;
+import com.example.zhtq.asticker.utils.SizeUtils;
 import com.example.zhtq.asticker.widgets.CustomSimpleAdapter;
 
 import java.util.ArrayList;
@@ -98,7 +103,7 @@ public class Ssq extends AppCompatActivity {
         mCaptureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                captureAndClear();
+                captureAndClear2();
             }
         });
 
@@ -110,7 +115,9 @@ public class Ssq extends AppCompatActivity {
                    para = "1";
                }
                int count = Integer.parseInt(para);
-               generateAtInterval(count, !mSortCancelChecker.isChecked(), !mMannualCaptureChecker.isChecked());
+               if (count < 1000) {
+                   generateAtInterval(count, !mSortCancelChecker.isChecked(), !mMannualCaptureChecker.isChecked());
+               }
             }
         });
     }
@@ -178,7 +185,7 @@ public class Ssq extends AppCompatActivity {
                     public void run() throws Exception {
                         LogUtil.d(TAG, "onComplete:%b!", autoCapture);
                         if (autoCapture) {
-                            captureAndClear();
+                            captureAndClear2();
                         }
                         runOnUiThread(new Runnable() {
                             @Override
@@ -225,11 +232,46 @@ public class Ssq extends AppCompatActivity {
             public void run() {
                 int[] pos = getRecyclerViewLastPosition();
                 LogUtil.d(TAG, "captured, pos:%s", Arrays.toString(pos));
-//                mAdapter.clear();
+                mAdapter.clear();
             }
         });
     }
 
+    private void captureAndClear2() {
+        final int textSize = getResources().getDimensionPixelSize(R.dimen.result_rcv_text_size2);
+        Point point = SizeUtils.getSize(this);
+        final int marginTop = dp2px(16);
+        Bitmap bitmap = Bitmap.createBitmap(point.x, (int)((mAdapter.getData().size() + 1) * textSize * 1.5f + marginTop * 2), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        TextPaint paint = new TextPaint();
+        paint.setTextSize(textSize);
+        String fileName = getFileNameByTime(-1, false);
+        canvas.drawColor(Color.WHITE);
+        final int marginStart = dp2px(32);
+        final int singleDigitWidth = (int)paint.measureText("88");
+        LogUtil.d(TAG, "captureAndClear2, text.size:%d; digit.width:%d;", textSize, singleDigitWidth);
+        canvas.drawText(fileName, marginStart, textSize * 1.5f, paint);
+        for (int i = 0; i < mAdapter.getData().size(); i++) {
+            byte[] item = mAdapter.getData().get(i);
+            for (int j = 0; j < item.length; j++) {
+                if (j == item.length - 1) {
+                    paint.setColor(Color.BLUE);
+                } else {
+                    paint.setColor(Color.RED);
+                }
+                canvas.drawText(Byte.toString(item[j]), marginStart + (singleDigitWidth + dp2px(8)) * j , textSize * 1.5f * (i + 2) + marginTop / 2.f , paint);
+            }
+        }
+        final String path = FileUtils.saveJpeg2ExternalStorage(bitmap, FileUtils.ROOT_DIR, fileName.concat(".jpg"));
+        LogUtil.d(TAG, "the result is saved:%s; size:%d.", path, bitmap.getAllocationByteCount());
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mAdapter.clear();
+                Toast.makeText(Ssq.this, getString(R.string.result_desc_output_file_path, path), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 
     public int[] getRecyclerViewLastPosition() {
 
@@ -237,28 +279,9 @@ public class Ssq extends AppCompatActivity {
             return null;
         }
         LinearLayoutManager layoutManager = (LinearLayoutManager)mRcv.getLayoutManager();
-        int[] pos = new int[3];
+        int[] pos = new int[2];
         pos[0] = layoutManager.findFirstCompletelyVisibleItemPosition();
         pos[1] = layoutManager.findLastCompletelyVisibleItemPosition();
-
-        OrientationHelper orientationHelper = OrientationHelper.createOrientationHelper(layoutManager, OrientationHelper.VERTICAL);
-        int fromIndex = 0;
-        int toIndex = mAdapter.getItemCount();
-        final int start = orientationHelper.getStartAfterPadding();
-        final int end = orientationHelper.getEndAfterPadding();
-        final int next = toIndex > fromIndex ? 1 : -1;
-        for (int i = fromIndex; i != toIndex; i += next) {
-            final View child = mRcv.getChildAt(i);
-            final int childStart = orientationHelper.getDecoratedStart(child);
-            final int childEnd = orientationHelper.getDecoratedEnd(child);
-            if (childStart < end && childEnd > start) {
-                if (childStart >= start && childEnd <= end) {
-                    pos[1] = childStart;
-                    LogUtil.v(TAG, "position = " + pos[0] + " off = " + pos[1]);
-                    return pos;
-                }
-            }
-        }
         return pos;
     }
 }

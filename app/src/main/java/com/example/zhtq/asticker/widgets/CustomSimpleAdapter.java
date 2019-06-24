@@ -2,8 +2,6 @@ package com.example.zhtq.asticker.widgets;
 
 import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -14,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.zhtq.asticker.R;
-import com.example.zhtq.asticker.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +31,10 @@ public class CustomSimpleAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         mData.add(data);
         notifyItemInserted(mData.size() - 1);
+    }
+
+    public List<byte[]> getData() {
+        return mData;
     }
 
     public void clear() {

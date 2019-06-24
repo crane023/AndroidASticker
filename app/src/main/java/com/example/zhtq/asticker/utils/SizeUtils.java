@@ -2,10 +2,13 @@ package com.example.zhtq.asticker.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Point;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 public final class SizeUtils {
 
@@ -105,5 +108,13 @@ public final class SizeUtils {
 
     public static int getDimenPxOffset(Context context, int id) {
         return context.getResources().getDimensionPixelOffset(id);
+    }
+
+    public static Point getSize(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point screenSize = new Point();
+        display.getRealSize(screenSize);
+        return screenSize;
     }
 }

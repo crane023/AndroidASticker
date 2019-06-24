@@ -2,4 +2,5 @@
 <resources>
     <dimen name="edit_text_size">16sp</dimen>
     <dimen name="result_rcv_text_size">16sp</dimen>
+    <dimen name="result_rcv_text_size2">20sp</dimen>
 </resources>
